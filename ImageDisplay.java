@@ -1,5 +1,4 @@
 
-import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
 import javax.swing.*;
@@ -35,20 +34,20 @@ public class ImageDisplay {
 			int frameLength = width*height*3;
 
 			File file = new File(imgPath);
-			RandomAccessFile raf = new RandomAccessFile(file, "r");
-			raf.seek(0);
+			byte[] bytes;
+			try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
+				raf.seek(0);
 
-			long len = frameLength;
-			byte[] bytes = new byte[(int) len];
+                bytes = new byte[(int) (long) frameLength];
 
-			raf.read(bytes);
+				raf.read(bytes);
+			}
 
 			int ind = 0;
 			for(int y = 0; y < height; y++)
 			{
 				for(int x = 0; x < width; x++)
 				{
-					byte a = 0;
 					byte r = bytes[ind];
 					byte g = bytes[ind+height*width];
 					byte b = bytes[ind+height*width*2];
@@ -59,10 +58,6 @@ public class ImageDisplay {
 					ind++;
 				}
 			}
-		}
-		catch (FileNotFoundException e)
-		{
-			e.printStackTrace();
 		}
 		catch (IOException e)
 		{

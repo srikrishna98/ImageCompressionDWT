@@ -28,8 +28,8 @@ public class ImageDisplay {
 	/** Read Image RGB
 	 *  Reads the image of given width and height at the given imgPath into the provided BufferedImage.
 	 */
-	private int[][][] readImageRGB(int width, int height, String imgPath) {
-		int[][][] imageRGB = new int[width][height][3];
+	private double[][][] readImageRGB(int width, int height, String imgPath) {
+		double[][][] imageRGB = new double[width][height][3];
 		try
 		{
 			int frameLength = width*height*3;
@@ -72,13 +72,48 @@ public class ImageDisplay {
 		return imageRGB;
 	}
 
-	public void displayImage(int [][][] imageRGB, String title){
+	public void displayImage2(double [][][] imageRGB){
+
+		imgOne = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		for(int y = 0; y < height; y++){
+			for(int x = 0; x< width; x++){
+				int pix = 0xff000000 | (((int)imageRGB[x][y][0]) << 16) | (((int)imageRGB[x][y][1]) << 8) | ((int)imageRGB[x][y][2]);
+
+				imgOne.setRGB(x,y,pix);
+			}
+		}
+
+		// Use label to display the image
+		frame = new JFrame();
+		GridBagLayout gLayout = new GridBagLayout();
+		frame.getContentPane().setLayout(gLayout);
+
+		lbIm1 = new JLabel(new ImageIcon(imgOne));
+
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.CENTER;
+		c.weightx = 0.5;
+		c.gridx = 0;
+		c.gridy = 0;
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 1;
+		frame.getContentPane().add(lbIm1, c);
+
+		frame.pack();
+		frame.setVisible(true);
+	}
+
+	public void displayImage(double [][][] imageRGB, String title){
 		int width = imageRGB.length;
 		int height = imageRGB[0].length;
 		imgOne = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				int pix = 0xff000000 | ((imageRGB[x][y][0]) << 16) | ((imageRGB[x][y][1]) << 8) | (imageRGB[x][y][2]);
+				int pix = 0xff000000 | (((int)imageRGB[x][y][0]) << 16) | (((int)imageRGB[x][y][1]) << 8) | ((int)imageRGB[x][y][2]);
 				imgOne.setRGB(x, y, pix);
 			}
 		}
@@ -88,10 +123,9 @@ public class ImageDisplay {
 		frame.repaint();
 	}
 
-	public int[][][] waveletProcess(int[][][] img, int rBound, int cBound){
-		int [][][] waveletImg = new int[width][height][3];
-		int [][][] tempImg = new int[width][height][3];
-//		Copy img to waveletImg
+	public double[][][] waveletProcess(double[][][] img, int rBound, int cBound){
+		double [][][] waveletImg = new double[width][height][3];
+		double [][][] tempImg = new double[width][height][3];
 		for(int i = 0; i < width; i++) {
 			for(int j = 0; j < height; j++) {
 				waveletImg[i][j][0] = img[i][j][0];
@@ -103,7 +137,6 @@ public class ImageDisplay {
 		for(int i = 0; i < 3; i++) {
 			for(int x = 0; x < rBound/2; x++) {
 				for(int y = 0; y < cBound; y++) {
-//					Low pass averaging of adjacent cells on the same row
 					tempImg[x][y][i] = (img[2*x][y][i] + img[2*x+1][y][i])/2;
 					tempImg[rBound/2 + x][y][i] = (img[2*x][y][i] - img[2*x+1][y][i])/2;
 				}
@@ -113,8 +146,6 @@ public class ImageDisplay {
 		for(int i = 0; i < 3; i++) {
 			for(int x = 0; x < rBound; x++) {
 				for(int y = 0; y < cBound/2; y++) {
-
-//					Low pass averaging of adjacent cells on the same row
 					waveletImg[x][y][i] = (tempImg[x][2*y][i] + tempImg[x][2*y+1][i])/2;
 					waveletImg[x][cBound/2 + y][i] = (tempImg[x][2*y][i] - tempImg[x][2*y+1][i])/2;
 				}
@@ -123,8 +154,8 @@ public class ImageDisplay {
 		return waveletImg;
 	}
 
-	public int[][][] compressImage(int[][][] ogImage, int n) {
-		int[][][] imageRGB = new int[width][height][3];
+	public double[][][] compressImage(double[][][] ogImage, int n) {
+		double[][][] imageRGB = new double[width][height][3];
 		int rBound, cBound;
 //		Copy ogImage to imageRGB
 		for(int i = 0; i < width; i++) {
@@ -143,10 +174,10 @@ public class ImageDisplay {
 		return imageRGB;
 	}
 
-	public int[][][] prepareDecode(int [][][]compressedImage, int n){
+	public double[][][] prepareDecode(double [][][]compressedImage, int n){
 		// Copy 2^n x 2^n from compressedImage to tempImg
 		//		Make all other pixels zero
-		int [][][] tempImg = new int[width][height][3];
+		double [][][] tempImg = new double[width][height][3];
 		int bound = (int) Math.pow(2, n);
 		for(int i = 0;i<3;i++){
 			for(int x = 0; x<bound; x++){
@@ -158,11 +189,11 @@ public class ImageDisplay {
 		return tempImg;
 	}
 
-	public void decodeImage(int[][][] compressedImage, int n){
+	public void decodeImage(double[][][] compressedImage, int n){
 
 		for(int k = n; k <= 9; k++){
 			int currBound = (int) Math.pow(2, k);
-			int [][][]temp = new int[currBound][currBound][3];
+			double [][][]temp = new double[currBound][currBound][3];
 
 			for(int i = 0 ; i<3; i++){
 				for(int x = 0; x < currBound; x++){
@@ -193,7 +224,7 @@ public class ImageDisplay {
 		imgOne = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		frame = new JFrame();
 
-		int [][][] inputImageRGB;
+		double [][][] inputImageRGB;
 
 		inputImageRGB = readImageRGB(width, height, args[0]);
 		if(num>0) {
@@ -203,16 +234,21 @@ public class ImageDisplay {
 				decodeImage(inputImageRGB, num + 1);
 			}
 			// Display the image
-			displayImage(inputImageRGB, "Decompressed");
+			displayImage(inputImageRGB, "Decompressed" + num);
 		}else{
 
-			int [][][] temp;
+			double [][][] temp;
 
 			for(int i = 0; i < 9; i++) {
 				temp = compressImage(inputImageRGB, i);
 				temp = prepareDecode(temp, i + 1);
 				decodeImage(temp, i + 1);
 				displayImage(temp, "Decompressed"+i);
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
 			}
 			displayImage(inputImageRGB, "Decompressed" + 9);
 		}

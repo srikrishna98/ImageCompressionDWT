@@ -72,41 +72,6 @@ public class ImageDisplay {
 		return imageRGB;
 	}
 
-	public void displayImage2(double [][][] imageRGB){
-
-		imgOne = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		for(int y = 0; y < height; y++){
-			for(int x = 0; x< width; x++){
-				int pix = 0xff000000 | (((int)imageRGB[x][y][0]) << 16) | (((int)imageRGB[x][y][1]) << 8) | ((int)imageRGB[x][y][2]);
-
-				imgOne.setRGB(x,y,pix);
-			}
-		}
-
-		// Use label to display the image
-		frame = new JFrame();
-		GridBagLayout gLayout = new GridBagLayout();
-		frame.getContentPane().setLayout(gLayout);
-
-		lbIm1 = new JLabel(new ImageIcon(imgOne));
-
-
-		GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.anchor = GridBagConstraints.CENTER;
-		c.weightx = 0.5;
-		c.gridx = 0;
-		c.gridy = 0;
-
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 1;
-		frame.getContentPane().add(lbIm1, c);
-
-		frame.pack();
-		frame.setVisible(true);
-	}
-
 	public void displayImage(double [][][] imageRGB, String title){
 		int width = imageRGB.length;
 		int height = imageRGB[0].length;
